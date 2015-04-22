@@ -1,4 +1,8 @@
 # hostapd
+
+2do
+- .deb packaging
+
 Script for compiling and packing latest and patched hostapd
 
 ```bash
