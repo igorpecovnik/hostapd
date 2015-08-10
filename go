@@ -10,7 +10,7 @@
 STABLE="no" 		# Comment this out to use development version
 
 # we need this
-apt-get install libnl-3-dev
+apt-get install libnl-3-dev libssl-dev libnl-genl-3-dev
 
 # get a copy of latest hostapd
 SRC=$(pwd)
