@@ -9,6 +9,9 @@
 #TARGET="realtek" 	# For (most) realtek use "realtek"
 STABLE="no" 		# Comment this out to use development version
 
+# we need this
+apt-get install libnl-3-dev
+
 # get a copy of latest hostapd
 SRC=$(pwd)
 
