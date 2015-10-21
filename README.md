@@ -1,11 +1,19 @@
 ![](https://raw.githubusercontent.com/igorpecovnik/hostapd/master/bin/hostapd.png)
 
-This is a script to compile, patch and pack hostapd deamon. It can be used as a drop-in replacement for Debian and Ubuntu based distributions.
+This is a script to compile, patch and pack hostapd deamon **from sources**. It can be used as a drop-in replacement **for Debian and Ubuntu** based distributions.
 
-You can choose between development and stable version but you always get those two patches on the top:
+You can choose between four combinations:
 
-- option to control HT coexistance separate from noscan (to force 40Mhz channels)
-- driver interface for rtl871x driver (to use with some realtek adapters)
+- development 
+- stable 
+
+and
+
+- default / all others  
+- Realtek adapters
+
+In all cases you get a new option **to control HT coexistance separate from noscan** - to force 40Mhz channels.
+
 
 ```bash
 sudo apt-get -y install git
