@@ -23,7 +23,7 @@ SRC=$(pwd)
 CPUS=$(grep -c 'processor' /proc/cpuinfo) 
 CTHREADS="-j$(($CPUS + $CPUS/2))"; 
 rm -f buildlog
-rm *.deb
+rm -f hostapd-armbian*.deb
 
 
 #--------------------------------------------------------------------------------------------------------------------------------
