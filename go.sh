@@ -10,8 +10,8 @@
 #
 
 
-#TARGET="-realtek" 									# For (most) realtek use "realtek"
-#STABLE="yes" 										# Comment this out to use development version
+#TARGET="-realtek"							# For (most) realtek use "realtek"
+#STABLE="yes"								# Comment this out to use development version
 STABLETAG="hostap_2_5"
 MAINTAINER="Igor Pecovnik"                  		# deb signature
 MAINTAINERMAIL="igor.pecovnik@****l.com"    		# deb signature 
