@@ -1,5 +1,3 @@
-# hostapd
-
 ![](https://raw.githubusercontent.com/igorpecovnik/hostapd/master/bin/hostapd.png)
 
 This is a script to compile, patch and pack hostapd deamon. It can be used as a drop-in replacement for Debian and Ubuntu based distributions.
