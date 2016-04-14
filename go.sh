@@ -103,7 +103,7 @@ compiling ()
 #--------------------------------------------------------------------------------------------------------------------------------
 make clean >/dev/null 2>&1
 echo -e "[\e[0;32m o.k. \x1B[0m] Compiling v$VERSION""$1."
-make $CTHREADS >> ../../build.log 2>&1
+make >> ../../build.log 2>&1
 if [ $? -ne 0 ] || [ ! -f $SRC/hostap/hostapd/hostapd ]; then
 	echo -e "[\e[0;31m err. \x1B[0m] hostapd not built."
         exit 1
