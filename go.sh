@@ -14,12 +14,12 @@
 [[ $MAINTAINERMAIL == "" ]] && MAINTAINERMAIL="igor.pecovnik@****l.com"                 # deb signature 
 [[ $REVISION == "" ]] && REVISION="1.0"
 [[ $ARCHITECTURE == "" ]] && ARCHITECTURE=$(dpkg --print-architecture)
-
+[[ $SRC == "" ]] && SRC=$(pwd)
 
 #--------------------------------------------------------------------------------------------------------------------------------
 # Set prerequisities and cleanup
 #--------------------------------------------------------------------------------------------------------------------------------
-SRC=$(pwd)
+
 CPUS=$(grep -c 'processor' /proc/cpuinfo) 
 CTHREADS="-j$(($CPUS + $CPUS/2))"; 
 rm -f build.log
@@ -34,6 +34,8 @@ echo -e "[\e[0;32m o.k. \x1B[0m] Downloading dependencies."
 apt-get -qq -y install libnl-3-dev libssl-dev libnl-genl-3-dev
 
 
+download ()
+{
 #--------------------------------------------------------------------------------------------------------------------------------
 # Download latest hostapd sources 
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -45,7 +47,7 @@ if [ -d "$SRC/hostap" ]; then
 	else
 		git clone -q git://w1.fi/hostap.git >> ../build.log 2>&1 
 fi
-
+}
 
 checkout ()
 {
@@ -58,18 +60,7 @@ if [ "$1" == "stable" ]; then
 	else
 	git checkout -f -q >> ../build.log 2>&1
 fi
-# Read version
-VERSION=$(cat $SRC/hostap/src/common/version.h | grep "#define VERSION_STR " | awk '{ print $3 }' | sed 's/\"//g')
 }
-
-#--------------------------------------------------------------------------------------------------------------------------------
-# Copy Driver interface for rtl871x driver
-#--------------------------------------------------------------------------------------------------------------------------------
-cp $SRC/files/*.* $SRC/hostap/src/drivers/
-cd $SRC/hostap/
-
-
-
 
 
 patching ()
@@ -110,8 +101,20 @@ if [ $? -ne 0 ] || [ ! -f $SRC/hostap/hostapd/hostapd ]; then
 fi
 }
 
+# download inside chroot fails
+if [ "$(stat -c %d:%i /)" == "$(stat -c %d:%i /proc/1/root/.)" ]; then
+echo "Outside chroot"
+download
 checkout "stable"
+fi
 
+#--------------------------------------------------------------------------------------------------------------------------------
+# Copy Driver interface for rtl871x driver
+#--------------------------------------------------------------------------------------------------------------------------------
+# Read version
+VERSION=$(cat $SRC/hostap/src/common/version.h | grep "#define VERSION_STR " | awk '{ print $3 }' | sed 's/\"//g')
+cp $SRC/files/*.* $SRC/hostap/src/drivers/
+cd $SRC/hostap/
 cd hostapd
 patching "-realtek"
 compiling " for Realteks"
