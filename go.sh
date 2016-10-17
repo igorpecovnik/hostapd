@@ -31,7 +31,7 @@ rm -f hostapd-armbian*.deb
 #--------------------------------------------------------------------------------------------------------------------------------
 echo -e "[\e[0;32m o.k. \x1B[0m] Building hostapd$TARGET"
 echo -e "[\e[0;32m o.k. \x1B[0m] Downloading dependencies."
-apt-get -qq -y install libnl-3-dev libssl-dev libnl-genl-3-dev
+apt-get -qq -y install libnl-3-dev libssl-dev libnl-genl-3-dev libnl*
 
 
 download ()
