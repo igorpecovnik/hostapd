@@ -45,7 +45,7 @@ if [ -d "$SRC/hostap" ]; then
 		git pull -q
 		echo -e "[\e[0;32m o.k. \x1B[0m] Updating sources."
 	else
-		git clone -q git://w1.fi/hostap.git >> ../build.log 2>&1 
+		git clone -q http://w1.fi/hostap.git >> ../build.log 2>&1 
 fi
 }
 
