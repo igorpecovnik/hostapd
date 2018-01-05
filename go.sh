@@ -92,7 +92,7 @@ for i in $SRC/patch/*.patch; do
 	patch -p1 -s --batch < $i
 	if [ $? -ne 0 ]; then echo -e "[\e[0;31m err. \x1B[0m] hostapd not built."; exit 1; fi
 done
-cp $SRC/config/config_realtek $SRC/hostap/hostapd/.config
+cp $SRC/config/config_default $SRC/hostap/hostapd/.config
 cd hostapd
 compiling
 
