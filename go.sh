@@ -12,7 +12,7 @@
 
 [[ $MAINTAINER == "" ]] && MAINTAINER="Igor Pecovnik"                                   # deb signature
 [[ $MAINTAINERMAIL == "" ]] && MAINTAINERMAIL="igor.pecovnik@****l.com"                 # deb signature
-[[ $REVISION == "" ]] && REVISION="1.0"
+[[ $REVISION == "" ]] && REVISION="1.1"
 [[ $ARCHITECTURE == "" ]] && ARCHITECTURE=$(dpkg --print-architecture)
 [[ $SRC == "" ]] && SRC=$(pwd)
 
@@ -81,6 +81,42 @@ download
 checkout "stable"
 fi
 
+packing ()
+{
+#--------------------------------------------------------------------------------------------------------------------------------
+# Pack to deb. Replacec files in original package
+#--------------------------------------------------------------------------------------------------------------------------------
+if [[ $1 == "-realtek" ]]; then REPLACES="hostapd-custom"; else REPLACES="hostapd-custom-realtek"; fi
+cd $SRC
+apt-get -qq -d install hostapd
+dpkg-deb -R /var/cache/apt/archives/hostapd* hostapd-custom$1${TARGET}"_"${REVISION}_${ARCHITECTURE}
+# set up control file
+cat <<END > hostapd-custom$1${TARGET}_${REVISION}_${ARCHITECTURE}/DEBIAN/control
+Package: hostapd-custom$1$TARGET
+Version: $REVISION
+Architecture: $ARCHITECTURE
+Maintainer: $MAINTAINER <$MAINTAINERMAIL>
+Installed-Size: 1
+Section: kernel
+Conflicts: hostapd
+Replaces: hostapd,hostapd-custom,hostapd-custom-realtek
+Priority: optional
+Description: Sources: https://github.com/igorpecovnik/hostapd
+END
+#
+
+cp "$SRC/hostap/hostapd/hostapd" "$SRC/hostap/hostapd/hostapd_cli" hostapd-custom$1${TARGET}_${REVISION}_${ARCHITECTURE}/usr/sbin
+cp $SRC/hostapd.conf/*.conf hostapd-custom$1${TARGET}_${REVISION}_${ARCHITECTURE}/etc
+cd hostapd-custom$1${TARGET}_${REVISION}_${ARCHITECTURE}
+find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum > DEBIAN/md5sums
+cd ..
+dpkg -b hostapd-custom$1${TARGET}_${REVISION}_${ARCHITECTURE} >/dev/null 2>&1
+rm -rf hostapd-custom$1${TARGET}_${REVISION}_${ARCHITECTURE}
+echo -e "[\e[0;32m o.k. \x1B[0m] All done. Hostapd is packed into: hostapd-custom$1${TARGET}_${REVISION}_${ARCHITECTURE}.deb"
+}
+
+
+
 #--------------------------------------------------------------------------------------------------------------------------------
 # Copy Driver interface for rtl871x driver
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -92,37 +128,16 @@ for i in $SRC/patch/*.patch; do
 	patch -p1 -s --batch < $i
 	if [ $? -ne 0 ]; then echo -e "[\e[0;31m err. \x1B[0m] hostapd not built."; exit 1; fi
 done
-cp $SRC/config/config_default $SRC/hostap/hostapd/.config
+cp $SRC/config/config_realtek $SRC/hostap/hostapd/.config
 cd hostapd
 compiling
-
-#--------------------------------------------------------------------------------------------------------------------------------
-# Pack to deb. Replacec files in original package
-#--------------------------------------------------------------------------------------------------------------------------------
-cd $SRC
-apt-get -qq -d install hostapd
-dpkg-deb -R /var/cache/apt/archives/hostapd* hostapd-custom${TARGET}"_"${REVISION}_${ARCHITECTURE}
-
-# set up control file
-cat <<END > hostapd-custom${TARGET}_${REVISION}_${ARCHITECTURE}/DEBIAN/control
-Package: hostapd-custom$TARGET
-Version: $REVISION
-Architecture: $ARCHITECTURE
-Maintainer: $MAINTAINER <$MAINTAINERMAIL>
-Installed-Size: 1
-Section: kernel
-Conflicts: hostapd
-Replaces: hostapd
-Priority: optional
-Description: Sources: https://github.com/igorpecovnik/hostapd
-END
-#
-
-cp "$SRC/hostap/hostapd/hostapd" "$SRC/hostap/hostapd/hostapd_cli" hostapd-custom${TARGET}_${REVISION}_${ARCHITECTURE}/usr/sbin
-cp $SRC/hostapd.conf/*.conf hostapd-custom${TARGET}_${REVISION}_${ARCHITECTURE}/etc
-cd hostapd-custom${TARGET}_${REVISION}_${ARCHITECTURE}
-find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum > DEBIAN/md5sums
-cd ..
-dpkg -b hostapd-custom${TARGET}_${REVISION}_${ARCHITECTURE} >/dev/null 2>&1
-rm -rf hostapd-custom${TARGET}_${REVISION}_${ARCHITECTURE}
-echo -e "[\e[0;32m o.k. \x1B[0m] All done. Hostapd is packed into: hostapd-custom${TARGET}_${REVISION}_${ARCHITECTURE}.deb"
+packing
+checkout "stable"
+cd $SRC/hostap/
+rm -f src/drivers/driver_rtl.h src/drivers/driver_rtw.c
+patch --batch -f -p1 < $SRC/patch/realtek/rtlxdrv.patch >> ../build.log 2>&1
+cp $SRC/config/config_realtek $SRC/hostap/hostapd/.config
+cp $SRC/files/*.* $SRC/hostap/src/drivers/
+cd hostapd
+compiling " realtek"
+packing "-realtek"
