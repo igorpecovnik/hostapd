@@ -41,12 +41,12 @@ index 16887ac..aa1f572 100644
 +		//return -1;
 +		return 0;//ignore this error
  	}
- 
+
  	if (ret < 0) {
-diff --git a/src/drivers/driver.h b/src/drivers/driver.h
+diff --git a/src/drivers/drivers.c b/src/drivers/drivers.c
 index a449cc9..3b9629c 100644
---- a/src/drivers/driver.h
-+++ b/src/drivers/driver.h
+--- a/src/drivers/drivers.c
++++ b/src/drivers/drivers.c
 @@ -4984,5 +4984,8 @@ extern const struct wpa_driver_ops wpa_driver_atheros_ops;
  #ifdef CONFIG_DRIVER_NONE
  extern const struct wpa_driver_ops wpa_driver_none_ops; /* driver_none.c */
